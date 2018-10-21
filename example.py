@@ -2,11 +2,11 @@ import os
 from tswrapper import TRTLServices
 import sqlite3
 import json
+import key
 
 # This example shows how to create new addresses
 # scan them for incoming transactions by blockheight
 # and store them into a sqlite3 database
-
 
 #set token
 os.environ["TRTL_SERVICES_TOKEN"] = "<TOKEN>"
@@ -45,7 +45,7 @@ c.execute("""CREATE TABLE IF NOT EXISTS transactions (
         );""")
 
 #create new address
-new_address = json.loads(TRTLServices.createAddress())
+new_address = TRTLServices.createAddress()
 
 #prepare db insert
 payload = ( new_address['address'], new_address['blockIndex'], new_address['blockIndex'])
@@ -62,19 +62,19 @@ for addresses in c.execute('SELECT * from addresses;'):
     newIndex = scanIndex + 100
 
     #check if addresses needs to be scanned
-    getStatus = json.loads(TRTLServices.getStatus()) 
+    getStatus = TRTLServices.getStatus()
 
     knownBlockCount = getStatus[1]['blockIndex']
     heightDiff = knownBlockCount - scanIndex
 
     if scanIndex >= knownBlockCount:
-        raise Exception('Reached top of chain.')
+        print('Reached top of chain.')
 
     if heightDiff < 100:
         newIndex = knownBlockCount
 
     #scan each address for transactions
-    incoming_txs = json.loads(TRTLServices.scanAddress(address, int(scanIndex)))
+    incoming_txs = TRTLServices.scanAddress(address, int(scanIndex))
 
     if not incoming_txs:
 
@@ -93,7 +93,7 @@ for addresses in c.execute('SELECT * from addresses;'):
             c.execute('UPDATE addresses SET scanIndex = ? WHERE address = ?')
 
             conn.commit()
-            print('[' + address + '] stored ' + len(incoming_tx) + ' transactions found between height: ' + str(scanIndex) + ' - ' + str(newIndex))
+            print('[' + address + '] stored ' + len(incoming_txs) + ' transactions found between height: ' + str(scanIndex) + ' - ' + str(newIndex))
 
 
 #load transactions
