@@ -2,7 +2,6 @@ import os
 from tswrapper import TRTLServices
 import sqlite3
 import json
-import key
 
 # This example shows how to create new addresses
 # scan them for incoming transactions by blockheight
