@@ -69,6 +69,7 @@ for addresses in c.execute('SELECT * from addresses;'):
 
     if scanIndex >= knownBlockCount:
         print('Reached top of chain.')
+        end()
 
     if heightDiff < 100:
         newIndex = knownBlockCount
